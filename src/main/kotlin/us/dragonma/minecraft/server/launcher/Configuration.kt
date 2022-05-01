@@ -2,9 +2,20 @@ package us.dragonma.minecraft.server.launcher
 
 import com.sksamuel.hoplite.ConfigLoaderBuilder
 import com.sksamuel.hoplite.PropertySource
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.net.URI
 import java.util.Properties
+
+// Latest stable versions as of 2022-05-01
+private const val LATEST_MINECRAFT_FABRIC_INSTALLER_VERSION = "0.10.2"
+private const val LATEST_MINECRAFT_FABRIC_LOADER_VERSION = "0.14.4"
+private const val LATEST_MINECRAFT_FORGE_VERSION = "40.1.0"
+private const val LATEST_MINECRAFT_VERSION = "1.18.2"
+
+private val lazyJson = Json { ignoreUnknownKeys = true }
 
 internal class Configuration(configFileName: String) {
     internal val log = Logger()
@@ -13,12 +24,67 @@ internal class Configuration(configFileName: String) {
     internal val server: ServerConfig
     internal val user: UserConfig
 
+    private val minecraftFabricInstallerVersion: String
+        get() {
+            return try {
+                val json = URI("https://meta.fabricmc.net/v2/versions/installer")
+                    .getText().body().toString()
+                val data = lazyJson.decodeFromString(ListSerializer(FabricApiInstallerVersion.serializer()), json)
+
+                data.find { it.stable }!!.version
+            } catch (e: Exception) {
+                LATEST_MINECRAFT_FABRIC_INSTALLER_VERSION
+            }
+        }
+    private val minecraftFabricLoaderVersion: String
+        get() {
+            return try {
+                val json = URI("https://meta.fabricmc.net/v2/versions/loader/$minecraftVersion")
+                    .getText().body().toString()
+                val data = lazyJson.decodeFromString(ListSerializer(FabricApiLoaderPayload.serializer()), json)
+
+                data.find { it.loader.stable }!!.loader.version
+            } catch (e: Exception) {
+                LATEST_MINECRAFT_FABRIC_LOADER_VERSION
+            }
+        }
+    private val minecraftForgeVersion = LATEST_MINECRAFT_FORGE_VERSION
+    private val minecraftVersion: String
+        get() {
+            return try {
+                val json = URI("https://meta.fabricmc.net/v2/versions/game")
+                    .getText().body().toString()
+                val data = lazyJson.decodeFromString(ListSerializer(FabricApiGameVersion.serializer()), json)
+
+                data.find { it.stable }!!.version
+            } catch (e: Exception) {
+                LATEST_MINECRAFT_VERSION
+            }
+        }
+    private val packwizEnable = false
+    private val packwizSource = URI("http://www.example.com/path/to/pack.toml")
+    private val serverGui = false
+    private val serverType = ServerType.Fabric
+
     init {
         val userDir = File(System.getProperty("user.dir"))
         val configFile = userDir.resolve(configFileName)
         val config = ConfigLoaderBuilder.default()
             .addSource(PropertySource.file(configFile, true))
-            .addSource(PropertySource.resource("/default.properties"))
+            .addSource(
+                PropertySource.map(
+                    mapOf(
+                        "minecraft.fabric.installer.version" to minecraftFabricInstallerVersion,
+                        "minecraft.fabric.loader.version" to minecraftFabricLoaderVersion,
+                        "minecraft.forge.version" to minecraftForgeVersion,
+                        "minecraft.version" to minecraftVersion,
+                        "packwiz.enable" to packwizEnable,
+                        "packwiz.source" to packwizSource,
+                        "server.gui" to serverGui,
+                        "server.type" to serverType,
+                    )
+                )
+            )
             .build()
             .loadConfigOrThrow<RootConfig>()
 
@@ -40,6 +106,33 @@ internal class Configuration(configFileName: String) {
             store(configFile.writer(), null)
         }
     }
+
+    @Serializable
+    private class FabricApiGameVersion(val version: String, val stable: Boolean)
+
+    @Serializable
+    private class FabricApiInstallerVersion(
+        // val url: String,
+        // val maven: String,
+        val version: String,
+        val stable: Boolean
+    )
+
+    @Serializable
+    private class FabricApiLoaderPayload(
+        val loader: FabricApiLoaderVersion
+        // val intermediary: FabricApiIntermediaryVersion,
+        // val launcherMeta: FabricApiLauncherMetaVersion
+    )
+
+    @Serializable
+    private class FabricApiLoaderVersion(
+        // val separator: String,
+        // val build: Int,
+        // val maven: String,
+        val version: String,
+        val stable: Boolean
+    )
 }
 
 internal data class RootConfig(
