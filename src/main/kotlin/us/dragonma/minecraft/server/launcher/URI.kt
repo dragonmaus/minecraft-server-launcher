@@ -8,16 +8,16 @@ import java.net.http.HttpResponse
 import java.nio.file.Path
 
 private fun <T> URI.get(handler: HttpResponse.BodyHandler<T>): HttpResponse<T> {
-    val client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS).build()
-    val request = HttpRequest.newBuilder().uri(this).build()
+	val client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS).build()
+	val request = HttpRequest.newBuilder().uri(this).build()
 
-    return client.send(request, handler)
+	return client.send(request, handler)
 }
 
 internal fun URI.getFile(file: File): HttpResponse<Path> {
-    return this.get(HttpResponse.BodyHandlers.ofFile(file.toPath()))
+	return this.get(HttpResponse.BodyHandlers.ofFile(file.toPath()))
 }
 
 internal fun URI.getText(): HttpResponse<String> {
-    return this.get(HttpResponse.BodyHandlers.ofString())
+	return this.get(HttpResponse.BodyHandlers.ofString())
 }
