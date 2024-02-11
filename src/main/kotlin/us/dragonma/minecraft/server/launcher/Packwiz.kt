@@ -24,8 +24,7 @@ internal object Packwiz {
 
 		if (!file.exists()) {
 			config.log.info("Downloading packwiz installer")
-			val releaseJson = URI("https://api.github.com/repos/packwiz/packwiz-installer-bootstrap/releases/latest")
-				.getText().body().toString()
+			val releaseJson = URI("https://api.github.com/repos/packwiz/packwiz-installer-bootstrap/releases/latest").getText().body().toString()
 			val releaseData = lazyJson.decodeFromString<GitHubRelease>(releaseJson)
 			URI(releaseData.assets.filter { it.name == file.name }[0].browserDownloadUrl)
 				.getFile(file)
@@ -38,5 +37,8 @@ internal object Packwiz {
 	private class GitHubRelease(val assets: List<GitHubReleaseAsset>)
 
 	@Serializable
-	private class GitHubReleaseAsset(val name: String, @SerialName("browser_download_url") val browserDownloadUrl: String)
+	private class GitHubReleaseAsset(
+		val name: String,
+		@SerialName("browser_download_url") val browserDownloadUrl: String,
+	)
 }

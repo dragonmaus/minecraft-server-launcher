@@ -12,8 +12,8 @@ repositories {
 }
 
 dependencies {
-	implementation("org.jetbrains.kotlinx", "kotlinx-serialization-json", "1.5.1")
-	implementation("com.sksamuel.hoplite", "hoplite-core", "2.7.4")
+	implementation("org.jetbrains.kotlinx", "kotlinx-serialization-json", "1.6.2")
+	implementation("com.sksamuel.hoplite", "hoplite-core", "2.7.5")
 }
 
 internal val projectGroup: String by project

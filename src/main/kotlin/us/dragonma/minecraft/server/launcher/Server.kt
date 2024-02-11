@@ -1,3 +1,6 @@
+// "Fixing" the too-long lines in this file would involve a truly ridiculous level of manual string construction.
+@file:Suppress("ktlint:standard:max-line-length")
+
 package us.dragonma.minecraft.server.launcher
 
 import java.io.File
@@ -5,7 +8,10 @@ import java.net.URI
 import java.util.Properties
 
 internal object Server {
-	internal fun run(config: Configuration, args: Array<String>): Int {
+	internal fun run(
+		config: Configuration,
+		args: Array<String>,
+	): Int {
 		acceptEula(config)
 
 		val installerFile = download(config)
@@ -32,17 +38,28 @@ internal object Server {
 				}
 
 				config.log.info("Starting Forge server")
-				status = Java.run(
-					listOf(
-						"@user_jvm_args.txt",
-						"@libraries/net/minecraftforge/forge/${config.minecraft.version}-${config.minecraft.forge.version}/${"win" ifWindowsElse "unix"}_args.txt"
-					) + gui + args
-				)
+				status =
+					Java.run(
+						listOf(
+							"@user_jvm_args.txt",
+							"@libraries/net/minecraftforge/forge/${config.minecraft.version}-${config.minecraft.forge.version}/${"win" ifWindowsElse "unix"}_args.txt",
+						) + gui + args,
+					)
 			}
 			ServerType.Quilt -> {
 				if (!config.user.dir.resolve("libraries").exists()) {
 					config.log.info("Running Quilt installer")
-					Java.runJarFile(installerFile, listOf("install", "server", config.minecraft.version, config.minecraft.quilt.loader.version, "--install-dir=.", "--download-server"))
+					Java.runJarFile(
+						installerFile,
+						listOf(
+							"install",
+							"server",
+							config.minecraft.version,
+							config.minecraft.quilt.loader.version,
+							"--install-dir=.",
+							"--download-server",
+						),
+					)
 				}
 
 				config.log.info("Starting Quilt server")

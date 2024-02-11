@@ -9,7 +9,10 @@ internal object Java {
 		return ProcessBuilder(listOf(javaCommand) + args).inheritIO().start().waitFor()
 	}
 
-	internal fun runJarFile(file: File, args: List<String>): Int {
+	internal fun runJarFile(
+		file: File,
+		args: List<String>,
+	): Int {
 		return this.run(listOf("-jar", file.toString()) + args)
 	}
 }

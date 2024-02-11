@@ -29,8 +29,7 @@ internal class Configuration(configFileName: String) {
 	private val minecraftFabricInstallerVersion: String
 		get() {
 			return try {
-				val json = URI("https://meta.fabricmc.net/v2/versions/installer")
-					.getText().body().toString()
+				val json = URI("https://meta.fabricmc.net/v2/versions/installer").getText().body().toString()
 				val data = lazyJson.decodeFromString(ListSerializer(FabricApiInstallerVersion.serializer()), json)
 
 				data.find { it.stable }!!.version
@@ -41,8 +40,7 @@ internal class Configuration(configFileName: String) {
 	private val minecraftFabricLoaderVersion: String
 		get() {
 			return try {
-				val json = URI("https://meta.fabricmc.net/v2/versions/loader/$minecraftVersion")
-					.getText().body().toString()
+				val json = URI("https://meta.fabricmc.net/v2/versions/loader/$minecraftVersion").getText().body().toString()
 				val data = lazyJson.decodeFromString(ListSerializer(FabricApiLoaderPayload.serializer()), json)
 
 				data.find { it.loader.stable }!!.loader.version
@@ -54,8 +52,7 @@ internal class Configuration(configFileName: String) {
 	private val minecraftQuiltInstallerVersion: String
 		get() {
 			return try {
-				val json = URI("https://meta.quiltmc.org/v3/versions/installer")
-					.getText().body().toString()
+				val json = URI("https://meta.quiltmc.org/v3/versions/installer").getText().body().toString()
 				val data = lazyJson.decodeFromString(ListSerializer(QuiltApiInstallerVersion.serializer()), json)
 
 				data.first().version
@@ -66,8 +63,7 @@ internal class Configuration(configFileName: String) {
 	private val minecraftQuiltLoaderVersion: String
 		get() {
 			return try {
-				val json = URI("https://meta.quiltmc.org/v3/versions/loader/$minecraftVersion")
-					.getText().body().toString()
+				val json = URI("https://meta.quiltmc.org/v3/versions/loader/$minecraftVersion").getText().body().toString()
 				val data = lazyJson.decodeFromString(ListSerializer(QuiltApiLoaderPayload.serializer()), json)
 
 				data.first().loader.version
@@ -78,8 +74,7 @@ internal class Configuration(configFileName: String) {
 	private val minecraftVersion: String
 		get() {
 			return try {
-				val json = URI("https://meta.fabricmc.net/v2/versions/game")
-					.getText().body().toString()
+				val json = URI("https://meta.fabricmc.net/v2/versions/game").getText().body().toString()
 				val data = lazyJson.decodeFromString(ListSerializer(FabricApiGameVersion.serializer()), json)
 
 				data.find { it.stable }!!.version
@@ -95,26 +90,28 @@ internal class Configuration(configFileName: String) {
 	init {
 		val userDir = File(System.getProperty("user.dir"))
 		val configFile = userDir.resolve(configFileName)
-		val config = ConfigLoaderBuilder.default()
-			.addSource(PropertySource.file(configFile, true))
-			.addSource(
-				PropertySource.map(
-					mapOf(
-						"minecraft.fabric.installer.version" to minecraftFabricInstallerVersion,
-						"minecraft.fabric.loader.version" to minecraftFabricLoaderVersion,
-						"minecraft.forge.version" to minecraftForgeVersion,
-						"minecraft.quilt.installer.version" to minecraftQuiltInstallerVersion,
-						"minecraft.quilt.loader.version" to minecraftQuiltLoaderVersion,
-						"minecraft.version" to minecraftVersion,
-						"packwiz.enable" to packwizEnable,
-						"packwiz.source" to packwizSource,
-						"server.gui" to serverGui,
-						"server.type" to serverType
-					)
+		val config =
+			ConfigLoaderBuilder
+				.default()
+				.addSource(PropertySource.file(configFile, true))
+				.addSource(
+					PropertySource.map(
+						mapOf(
+							"minecraft.fabric.installer.version" to minecraftFabricInstallerVersion,
+							"minecraft.fabric.loader.version" to minecraftFabricLoaderVersion,
+							"minecraft.forge.version" to minecraftForgeVersion,
+							"minecraft.quilt.installer.version" to minecraftQuiltInstallerVersion,
+							"minecraft.quilt.loader.version" to minecraftQuiltLoaderVersion,
+							"minecraft.version" to minecraftVersion,
+							"packwiz.enable" to packwizEnable,
+							"packwiz.source" to packwizSource,
+							"server.gui" to serverGui,
+							"server.type" to serverType,
+						),
+					),
 				)
-			)
-			.build()
-			.loadConfigOrThrow<RootConfig>()
+				.build()
+				.loadConfigOrThrow<RootConfig>()
 
 		minecraft = config.minecraft
 		packwiz = config.packwiz
@@ -145,12 +142,12 @@ internal class Configuration(configFileName: String) {
 		// val url: String,
 		// val maven: String,
 		val version: String,
-		val stable: Boolean
+		val stable: Boolean,
 	)
 
 	@Serializable
 	private class FabricApiLoaderPayload(
-		val loader: FabricApiLoaderVersion
+		val loader: FabricApiLoaderVersion,
 		// val intermediary: FabricApiIntermediaryVersion,
 		// val launcherMeta: FabricApiLauncherMetaVersion,
 	)
@@ -161,19 +158,19 @@ internal class Configuration(configFileName: String) {
 		// val build: Int,
 		// val maven: String,
 		val version: String,
-		val stable: Boolean
+		val stable: Boolean,
 	)
 
 	@Serializable
 	private class QuiltApiInstallerVersion(
 		// val url: String,
 		// val maven: String,
-		val version: String
+		val version: String,
 	)
 
 	@Serializable
 	private class QuiltApiLoaderPayload(
-		val loader: QuiltApiLoaderVersion
+		val loader: QuiltApiLoaderVersion,
 		// val hashed: QuiltApiHashedVersion,
 		// val intermediary: QuiltApiIntermediaryVersion,
 		// val launcherMeta: QuiltApiLauncherMetaVersion,
@@ -184,38 +181,45 @@ internal class Configuration(configFileName: String) {
 		// val separator: String,
 		// val build: Int,
 		// val maven: String,
-		val version: String
+		val version: String,
 	)
 }
 
 internal data class RootConfig(
 	val minecraft: MinecraftConfig,
 	val packwiz: PackwizConfig,
-	val server: ServerConfig
+	val server: ServerConfig,
 )
 
 internal data class MinecraftConfig(
 	val fabric: MinecraftFabricConfig,
 	val forge: MinecraftForgeConfig,
 	val quilt: MinecraftQuiltConfig,
-	val version: String
+	val version: String,
 )
 
 internal data class MinecraftFabricConfig(
 	val installer: MinecraftFabricInstallerConfig,
-	val loader: MinecraftFabricLoaderConfig
+	val loader: MinecraftFabricLoaderConfig,
 )
 
 internal data class MinecraftQuiltConfig(
 	val installer: MinecraftQuiltInstallerConfig,
-	val loader: MinecraftQuiltLoaderConfig
+	val loader: MinecraftQuiltLoaderConfig,
 )
 
 internal data class MinecraftFabricInstallerConfig(val version: String)
+
 internal data class MinecraftFabricLoaderConfig(val version: String)
+
 internal data class MinecraftForgeConfig(val version: String)
+
 internal data class MinecraftQuiltInstallerConfig(val version: String)
+
 internal data class MinecraftQuiltLoaderConfig(val version: String)
+
 internal data class PackwizConfig(val enable: Boolean, val source: URI)
+
 internal data class ServerConfig(val gui: Boolean, val type: ServerType)
+
 internal data class UserConfig(val dir: File)
