@@ -9,13 +9,13 @@ import java.io.File
 import java.net.URI
 import java.util.Properties
 
-// Latest stable versions as of 2023-06-05
-private const val LATEST_MINECRAFT_FABRIC_INSTALLER_VERSION = "0.10.2"
-private const val LATEST_MINECRAFT_FABRIC_LOADER_VERSION = "0.14.21"
-private const val LATEST_MINECRAFT_FORGE_VERSION = "45.0.66"
-private const val LATEST_MINECRAFT_QUILT_INSTALLER_VERSION = "0.5.0"
-private const val LATEST_MINECRAFT_QUILT_LOADER_VERSION = "0.19.0-beta.18"
-private const val LATEST_MINECRAFT_VERSION = "1.19.4"
+// Latest stable versions as of 2025-03-08
+private const val LATEST_MINECRAFT_FABRIC_INSTALLER_VERSION = "1.0.1"
+private const val LATEST_MINECRAFT_FABRIC_LOADER_VERSION = "0.16.10"
+private const val LATEST_MINECRAFT_FORGE_VERSION = "54.1.2"
+private const val LATEST_MINECRAFT_QUILT_INSTALLER_VERSION = "0.11.3"
+private const val LATEST_MINECRAFT_QUILT_LOADER_VERSION = "0.28.1-beta.1"
+private const val LATEST_MINECRAFT_VERSION = "1.21.4"
 
 private val lazyJson = Json { ignoreUnknownKeys = true }
 
