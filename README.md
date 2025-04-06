@@ -1,3 +1,3 @@
 # Minecraft Server Launcher
 
-A simple wrapper for Fabric, Forge, and Quilt servers, providing optional packwiz integration.
+A simple wrapper for modded Minecraft servers, providing optional packwiz integration.

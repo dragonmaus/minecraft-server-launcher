@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
 	kotlin("jvm")
 	kotlin("plugin.serialization")
@@ -12,7 +14,7 @@ repositories {
 }
 
 dependencies {
-	implementation("org.jetbrains.kotlinx", "kotlinx-serialization-json", "1.8.0")
+	implementation("org.jetbrains.kotlinx", "kotlinx-serialization-json", "1.8.1")
 	implementation("com.sksamuel.hoplite", "hoplite-core", "2.9.0")
 }
 
@@ -24,6 +26,12 @@ version = projectVersion
 application.mainClass.set("us.dragonma.minecraft.server.launcher.MainKt")
 
 internal val javaVersion: String by project
+
+kotlin {
+	compilerOptions {
+		jvmTarget.set(JvmTarget.fromTarget(javaVersion))
+	}
+}
 
 java {
 	val javaVersion = JavaVersion.toVersion(javaVersion)
@@ -43,10 +51,6 @@ tasks.compileJava {
 	options.release.set(javaVersion.toInt())
 	sourceCompatibility = javaVersion
 	targetCompatibility = javaVersion
-}
-
-tasks.compileKotlin {
-	kotlinOptions.jvmTarget = javaVersion
 }
 
 tasks.jar {

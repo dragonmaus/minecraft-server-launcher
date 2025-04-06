@@ -23,11 +23,49 @@ internal object Server {
 				config.log.info("Starting Fabric server")
 				status = Java.runJarFile(installerFile, gui + args)
 			}
+
 			ServerType.Forge -> {
-				if (!config.user.dir.resolve("libraries").exists()) {
+				if (!config.user.dir
+						.resolve("libraries")
+						.exists()
+				) {
 					config.log.info("Running Forge installer")
 					Java.runJarFile(installerFile, listOf("--installServer"))
 					config.log.info("Cleaning up after Forge installer")
+					listOf(
+						"README.txt",
+						"${installerFile.name}.log",
+						"forge-${config.minecraft.version}-${config.minecraft.forge.version}-shim.jar",
+						"run.bat",
+						"run.sh",
+					).forEach {
+						val file = config.user.dir.resolve(it)
+						if (file.exists()) {
+							file.delete()
+							config.log.info2("Removed ${file.name}")
+						}
+					}
+				}
+				config.log.info("Starting Forge server")
+				status =
+					Java.run(
+						listOf(
+							"@user_jvm_args.txt",
+							"@libraries/net/minecraftforge/forge/${config.minecraft.version}-${config.minecraft.forge.version}/${"win" ifWindowsElse "unix"}_args.txt",
+						) +
+							gui +
+							args,
+					)
+			}
+
+			ServerType.NeoForge -> {
+				if (!config.user.dir
+						.resolve("libraries")
+						.exists()
+				) {
+					config.log.info("Running NeoForge installer")
+					Java.runJarFile(installerFile, listOf("--install-server"))
+					config.log.info("Cleaning up after NeoForge installer")
 					listOf("${installerFile.name}.log", "run.bat", "run.sh").forEach {
 						val file = config.user.dir.resolve(it)
 						if (file.exists()) {
@@ -36,32 +74,29 @@ internal object Server {
 						}
 					}
 				}
-
-				config.log.info("Starting Forge server")
+				config.log.info("Starting NeoForge server")
 				status =
 					Java.run(
 						listOf(
 							"@user_jvm_args.txt",
-							"@libraries/net/minecraftforge/forge/${config.minecraft.version}-${config.minecraft.forge.version}/${"win" ifWindowsElse "unix"}_args.txt",
-						) + gui + args,
+							"@libraries/net/neoforged/neoforge/${config.minecraft.neoforge.version}/${"win" ifWindowsElse "unix"}_args.txt",
+						) +
+							gui +
+							args,
 					)
 			}
+
 			ServerType.Quilt -> {
-				if (!config.user.dir.resolve("libraries").exists()) {
+				if (!config.user.dir
+						.resolve("libraries")
+						.exists()
+				) {
 					config.log.info("Running Quilt installer")
 					Java.runJarFile(
 						installerFile,
-						listOf(
-							"install",
-							"server",
-							config.minecraft.version,
-							config.minecraft.quilt.loader.version,
-							"--install-dir=.",
-							"--download-server",
-						),
+						listOf("install", "server", config.minecraft.version, config.minecraft.quilt.loader.version, "--install-dir=.", "--download-server"),
 					)
 				}
-
 				config.log.info("Starting Quilt server")
 				status = Java.runJarFile(config.user.dir.resolve("quilt-server-launch.jar"), gui + args)
 			}
@@ -79,7 +114,12 @@ internal object Server {
 		Properties().apply {
 			clear()
 			set("eula", "true")
-			store(config.user.dir.resolve("eula.txt").writer(), null)
+			store(
+				config.user.dir
+					.resolve("eula.txt")
+					.writer(),
+				null,
+			)
 		}
 	}
 
@@ -89,16 +129,32 @@ internal object Server {
 
 		when (config.server.type) {
 			ServerType.Fabric -> {
-				file = config.user.dir.resolve("fabric-server-mc.${config.minecraft.version}-loader.${config.minecraft.fabric.loader.version}-launcher.${config.minecraft.fabric.installer.version}.jar")
-				uri = URI("https://meta.fabricmc.net/v2/versions/loader/${config.minecraft.version}/${config.minecraft.fabric.loader.version}/${config.minecraft.fabric.installer.version}/server/jar")
+				file =
+					config.user.dir.resolve(
+						"fabric-server-mc.${config.minecraft.version}-loader.${config.minecraft.fabric.loader.version}-launcher.${config.minecraft.fabric.installer.version}.jar",
+					)
+				uri =
+					URI(
+						"https://meta.fabricmc.net/v2/versions/loader/${config.minecraft.version}/${config.minecraft.fabric.loader.version}/${config.minecraft.fabric.installer.version}/server/jar",
+					)
 			}
 			ServerType.Forge -> {
 				file = config.user.dir.resolve("forge-${config.minecraft.version}-${config.minecraft.forge.version}-installer.jar")
-				uri = URI("https://maven.minecraftforge.net/net/minecraftforge/forge/${config.minecraft.version}-${config.minecraft.forge.version}/${file.name}")
+				uri =
+					URI(
+						"https://maven.minecraftforge.net/net/minecraftforge/forge/${config.minecraft.version}-${config.minecraft.forge.version}/${file.name}",
+					)
+			}
+			ServerType.NeoForge -> {
+				file = config.user.dir.resolve("neoforge-${config.minecraft.neoforge.version}-installer.jar")
+				uri = URI("https://maven.neoforged.net/releases/net/neoforged/neoforge/${config.minecraft.neoforge.version}/${file.name}")
 			}
 			ServerType.Quilt -> {
 				file = config.user.dir.resolve("quilt-installer-${config.minecraft.quilt.installer.version}.jar")
-				uri = URI("https://maven.quiltmc.org/repository/release/org/quiltmc/quilt-installer/${config.minecraft.quilt.installer.version}/quilt-installer-${config.minecraft.quilt.installer.version}.jar")
+				uri =
+					URI(
+						"https://maven.quiltmc.org/repository/release/org/quiltmc/quilt-installer/${config.minecraft.quilt.installer.version}/quilt-installer-${config.minecraft.quilt.installer.version}.jar",
+					)
 			}
 		}
 

@@ -2,7 +2,10 @@ package us.dragonma.minecraft.server.launcher
 
 import java.io.PrintStream
 
-class Logger(private val out: PrintStream = System.out, private val err: PrintStream = System.err) {
+class Logger(
+	private val out: PrintStream = System.out,
+	private val err: PrintStream = System.err,
+) {
 	fun info(message: String) {
 		out.println("### $message ###")
 	}

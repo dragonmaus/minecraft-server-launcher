@@ -14,10 +14,6 @@ private fun <T> URI.get(handler: HttpResponse.BodyHandler<T>): HttpResponse<T> {
 	return client.send(request, handler)
 }
 
-internal fun URI.getFile(file: File): HttpResponse<Path> {
-	return this.get(HttpResponse.BodyHandlers.ofFile(file.toPath()))
-}
+internal fun URI.getFile(file: File): HttpResponse<Path> = this.get(HttpResponse.BodyHandlers.ofFile(file.toPath()))
 
-internal fun URI.getText(): HttpResponse<String> {
-	return this.get(HttpResponse.BodyHandlers.ofString())
-}
+internal fun URI.getText(): HttpResponse<String> = this.get(HttpResponse.BodyHandlers.ofString())
