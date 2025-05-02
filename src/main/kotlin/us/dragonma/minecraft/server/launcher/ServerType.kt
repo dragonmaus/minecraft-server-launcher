@@ -1,8 +1,8 @@
 package us.dragonma.minecraft.server.launcher
 
 internal enum class ServerType {
-	Fabric,
-	Forge,
-	NeoForge,
-	Quilt,
+    Fabric,
+    Forge,
+    NeoForge,
+    Quilt,
 }
